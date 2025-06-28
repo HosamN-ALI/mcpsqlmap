@@ -5,10 +5,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from typing import Dict, Any
+from dotenv import load_dotenv
 
 from .api.routes import router as api_router
 from .core.mcp_server import MCPServer
 from .integrations.integration_manager import IntegrationManager
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -52,6 +56,7 @@ async def lifespan(app: FastAPI):
         logger.info("Shutting down MCP Server...")
         if integration_manager:
             await integration_manager.close()
+        integration_manager = None
 
 # Initialize FastAPI application
 app = FastAPI(
@@ -83,26 +88,26 @@ async def root():
         "status": "running"
     }
 
-    @app.get("/status")
-    async def get_status():
-        """Get server status"""
-        try:
-            # Simulate an error for testing
-            if os.getenv("SIMULATE_STATUS_ERROR"):
-                raise Exception("Simulated status error")
-                
-            return {
-                "status": "healthy",
-                "integrations": {
-                    "langchain": integration_manager is not None,
-                    "openwebui": integration_manager is not None
-                }
+@app.get("/status")
+async def get_status():
+    """Get server status"""
+    try:
+        # Simulate an error for testing
+        if os.getenv("SIMULATE_STATUS_ERROR"):
+            raise Exception("Simulated status error")
+            
+        return {
+            "status": "healthy",
+            "integrations": {
+                "langchain": integration_manager is not None,
+                "openwebui": integration_manager is not None
             }
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error getting server status: {str(e)}"
-            )
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting server status: {str(e)}"
+        )
 
 def start_server(host: str = "0.0.0.0", 
                  port: int = 8000, 
@@ -118,6 +123,11 @@ def start_server(host: str = "0.0.0.0",
         config: Additional configuration options
     """
     try:
+        # Check environment variables
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+        if not api_key:
+            logger.warning("DEEPSEEK_API_KEY not found in environment variables")
+        
         # Apply configuration if provided
         if config:
             for key, value in config.items():
@@ -138,7 +148,7 @@ def start_server(host: str = "0.0.0.0",
 
 if __name__ == "__main__":
     # Load environment variables
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("DEEPSEEK_API_KEY")
     if not api_key:
         logger.warning("DEEPSEEK_API_KEY not found in environment variables")
     

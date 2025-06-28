@@ -1,0 +1,16 @@
+INFO:     Started server process [2215]
+INFO:     Waiting for application startup.
+2025-06-28 22:33:06,177 - mcp_server - INFO - Initializing MCP Server...
+2025-06-28 22:33:06,177 - mcp_server - INFO - Initializing MCP Server...
+2025-06-28 22:33:06,177 - integration_manager - INFO - Integration resources cleaned up
+2025-06-28 22:33:06,177 - integration_manager - INFO - Integration resources cleaned up
+2025-06-28 22:33:06,177 - integration_manager - INFO - Integration resources cleaned up
+2025-06-28 22:33:06,177 - integration_manager - INFO - Integrations initialized successfully
+2025-06-28 22:33:06,177 - integration_manager - INFO - Integrations initialized successfully
+2025-06-28 22:33:06,177 - integration_manager - INFO - Integrations initialized successfully
+2025-06-28 22:33:06,177 - mcp_server - INFO - Integrations initialized successfully
+2025-06-28 22:33:06,177 - mcp_server - INFO - Integrations initialized successfully
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     34.83.81.205:0 - "GET / HTTP/1.1" 200 OK
+INFO:     34.83.81.205:0 - "GET /status HTTP/1.1" 200 OK
