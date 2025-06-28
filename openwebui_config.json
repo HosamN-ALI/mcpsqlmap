@@ -1,0 +1,144 @@
+{
+  "mcp_server_integration": {
+    "external_api": {
+      "name": "MCP SQLMap Server",
+      "base_url": "http://a36599630488ccf5d3.blackbx.ai",
+      "api_key": "sk-1bd5de3f31db429cb8cbe73875537c5c",
+      "model": "mcp-sqlmap",
+      "enabled": true,
+      "description": "Advanced SQL injection vulnerability scanner with DeepSeek AI analysis"
+    },
+    "model": {
+      "id": "mcp-sqlmap",
+      "name": "MCP SQLMap Security Scanner",
+      "owned_by": "mcp-server",
+      "object": "model",
+      "created": 1640995200,
+      "permission": [],
+      "root": "mcp-sqlmap",
+      "parent": null,
+      "info": {
+        "description": "Advanced SQL injection vulnerability scanner with AI-powered analysis",
+        "capabilities": [
+          "SQL injection detection",
+          "WAF bypass techniques", 
+          "Payload analysis",
+          "Vulnerability assessment"
+        ]
+      }
+    },
+    "functions": [
+      {
+        "name": "sql_injection_scan",
+        "description": "Scan for SQL injection vulnerabilities",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "target_url": {
+              "type": "string",
+              "description": "Target URL to scan for SQL injection"
+            },
+            "options": {
+              "type": "object",
+              "description": "Scan options (depth, threads, etc.)",
+              "properties": {
+                "depth": {"type": "integer", "default": 2},
+                "threads": {"type": "integer", "default": 5}
+              }
+            }
+          },
+          "required": ["target_url"]
+        },
+        "endpoint": "http://a36599630488ccf5d3.blackbx.ai/api/v1/scan",
+        "method": "POST"
+      },
+      {
+        "name": "analyze_payload",
+        "description": "Analyze SQL injection payload using DeepSeek AI",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "string",
+              "description": "SQL injection payload to analyze"
+            },
+            "context": {
+              "type": "string",
+              "description": "Context information (optional)"
+            }
+          },
+          "required": ["payload"]
+        },
+        "endpoint": "http://a36599630488ccf5d3.blackbx.ai/api/v1/analyze",
+        "method": "POST"
+      },
+      {
+        "name": "waf_bypass",
+        "description": "Generate WAF bypass techniques for payloads",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "string",
+              "description": "Original SQL injection payload"
+            },
+            "techniques": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Specific bypass techniques to apply"
+            }
+          },
+          "required": ["payload"]
+        },
+        "endpoint": "http://a36599630488ccf5d3.blackbx.ai/api/v1/bypass",
+        "method": "POST"
+      },
+      {
+        "name": "get_payloads",
+        "description": "Get available SQL injection payloads",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Payload source (fuzzdb, payloadsallthethings, nosql, custom)"
+            },
+            "category": {
+              "type": "string",
+              "description": "Payload category"
+            }
+          }
+        },
+        "endpoint": "http://a36599630488ccf5d3.blackbx.ai/api/v1/payloads",
+        "method": "GET"
+      }
+    ],
+    "webhook": {
+      "name": "MCP Server Updates",
+      "url": "http://172.245.232.168:3000/api/webhooks/mcp-updates",
+      "events": ["scan_complete", "vulnerability_found", "analysis_complete"],
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "enabled": true
+    }
+  },
+  "connection_info": {
+    "webui_admin_url": "http://172.245.232.168:3000/admin/settings/general",
+    "webui_base_url": "http://172.245.232.168:3000",
+    "mcp_server_url": "http://a36599630488ccf5d3.blackbx.ai",
+    "credentials": {
+      "email": "deepgaza@hotmail.com",
+      "password": "123Zaq!@#"
+    }
+  },
+  "endpoints": {
+    "health": "http://a36599630488ccf5d3.blackbx.ai/api/v1/health",
+    "status": "http://a36599630488ccf5d3.blackbx.ai/status",
+    "scan": "http://a36599630488ccf5d3.blackbx.ai/api/v1/scan",
+    "inject": "http://a36599630488ccf5d3.blackbx.ai/api/v1/inject",
+    "bypass": "http://a36599630488ccf5d3.blackbx.ai/api/v1/bypass",
+    "payloads": "http://a36599630488ccf5d3.blackbx.ai/api/v1/payloads",
+    "analyze": "http://a36599630488ccf5d3.blackbx.ai/api/v1/analyze"
+  }
+}
