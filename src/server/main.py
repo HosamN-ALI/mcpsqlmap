@@ -5,10 +5,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from typing import Dict, Any
+from dotenv import load_dotenv
 
 from .api.routes import router as api_router
 from .core.mcp_server import MCPServer
 from .integrations.integration_manager import IntegrationManager
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(

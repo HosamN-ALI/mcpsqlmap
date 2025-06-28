@@ -12,7 +12,8 @@ aiofiles>=0.8.0
 
 # LangChain Integration
 langchain>=0.0.150
-openai>=0.27.0
+# DeepSeek API (using OpenAI-compatible client)
+openai>=1.0.0
 
 # Utilities
 python-dotenv>=0.19.0

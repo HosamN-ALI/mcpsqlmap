@@ -1,7 +1,7 @@
 import pytest
 import json
 import os
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, AsyncMock
 from ..payloads.payload_manager import PayloadManager, PayloadSource, Payload
 
 @pytest.fixture
@@ -26,58 +26,82 @@ def test_initialization(payload_manager):
         assert source.value in payload_manager.payloads
 
 @pytest.mark.asyncio
-async def test_load_fuzzdb_payloads(payload_manager, mock_response):
+async def test_load_fuzzdb_payloads(payload_manager, tmp_path):
     """Test loading payloads from FuzzDB"""
-    mock_payloads = """
-    ' OR '1'='1
-    ' UNION SELECT NULL--
-    1'; DROP TABLE users--
-    """
+    # Create mock directory structure
+    fuzzdb_dir = tmp_path / "fuzzdb-master" / "attack" / "sql-injection" / "detect"
+    fuzzdb_dir.mkdir(parents=True)
     
-    with patch('requests.get') as mock_get:
-        mock_get.return_value = mock_response(200, mock_payloads)
+    # Create mock payload file
+    payload_file = fuzzdb_dir / "generic_sql.txt"
+    payload_file.write_text("' OR '1'='1\n' UNION SELECT NULL--\n1'; DROP TABLE users--\n")
+    
+    # Update source configuration to use temp directory
+    original_base = payload_manager.sources[PayloadSource.FUZZDB.value]["base"]
+    payload_manager.sources[PayloadSource.FUZZDB.value]["base"] = str(tmp_path / "fuzzdb-master")
+    
+    try:
         await payload_manager._load_fuzzdb_payloads()
         
         assert len(payload_manager.payloads[PayloadSource.FUZZDB.value]) > 0
         payload = payload_manager.payloads[PayloadSource.FUZZDB.value][0]
         assert isinstance(payload, Payload)
         assert payload.source == PayloadSource.FUZZDB.value
+    finally:
+        # Restore original configuration
+        payload_manager.sources[PayloadSource.FUZZDB.value]["base"] = original_base
 
 @pytest.mark.asyncio
-async def test_load_pat_payloads(payload_manager, mock_response):
+async def test_load_pat_payloads(payload_manager, tmp_path):
     """Test loading payloads from PayloadsAllTheThings"""
-    mock_payloads = """
-    admin' --
-    admin' #
-    admin'/*
-    """
+    # Create mock directory structure
+    pat_dir = tmp_path / "PayloadsAllTheThings-master" / "SQL Injection"
+    pat_dir.mkdir(parents=True)
     
-    with patch('requests.get') as mock_get:
-        mock_get.return_value = mock_response(200, mock_payloads)
+    # Create mock payload file
+    payload_file = pat_dir / "README.md"
+    payload_file.write_text("admin' --\nadmin' #\nadmin'/*\n")
+    
+    # Update source configuration to use temp directory
+    original_base = payload_manager.sources[PayloadSource.PAYLOADSALLTHETHINGS.value]["base"]
+    payload_manager.sources[PayloadSource.PAYLOADSALLTHETHINGS.value]["base"] = str(tmp_path / "PayloadsAllTheThings-master")
+    
+    try:
         await payload_manager._load_pat_payloads()
         
         assert len(payload_manager.payloads[PayloadSource.PAYLOADSALLTHETHINGS.value]) > 0
         payload = payload_manager.payloads[PayloadSource.PAYLOADSALLTHETHINGS.value][0]
         assert isinstance(payload, Payload)
         assert payload.source == PayloadSource.PAYLOADSALLTHETHINGS.value
+    finally:
+        # Restore original configuration
+        payload_manager.sources[PayloadSource.PAYLOADSALLTHETHINGS.value]["base"] = original_base
 
 @pytest.mark.asyncio
-async def test_load_nosql_payloads(payload_manager, mock_response):
+async def test_load_nosql_payloads(payload_manager, tmp_path):
     """Test loading NoSQL payloads"""
-    mock_payloads = """
-    {"$ne": null}
-    {"$gt": ""}
-    {"$where": "this.password.length > 0"}
-    """
+    # Create mock directory structure
+    nosql_dir = tmp_path / "nosqlinjection_wordlists-master"
+    nosql_dir.mkdir(parents=True)
     
-    with patch('requests.get') as mock_get:
-        mock_get.return_value = mock_response(200, mock_payloads)
+    # Create mock payload file
+    payload_file = nosql_dir / "mongodb_nosqli.txt"
+    payload_file.write_text('{"$ne": null}\n{"$gt": ""}\n{"$where": "this.password.length > 0"}\n')
+    
+    # Update source configuration to use temp directory
+    original_base = payload_manager.sources[PayloadSource.NOSQL.value]["base"]
+    payload_manager.sources[PayloadSource.NOSQL.value]["base"] = str(tmp_path / "nosqlinjection_wordlists-master")
+    
+    try:
         await payload_manager._load_nosql_payloads()
         
         assert len(payload_manager.payloads[PayloadSource.NOSQL.value]) > 0
         payload = payload_manager.payloads[PayloadSource.NOSQL.value][0]
         assert isinstance(payload, Payload)
         assert payload.source == PayloadSource.NOSQL.value
+    finally:
+        # Restore original configuration
+        payload_manager.sources[PayloadSource.NOSQL.value]["base"] = original_base
 
 def test_add_custom_payload(payload_manager):
     """Test adding custom payload"""
