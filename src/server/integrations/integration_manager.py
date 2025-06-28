@@ -205,31 +205,7 @@ class IntegrationManager:
                 error=f"Failed to update WebUI: {str(e)}"
             )
 
-    async def close(self):
-        """
-        Cleanup integration resources
-        
-        This method should be called when the integration manager is no longer needed
-        to properly close any open sessions and cleanup resources.
-        """
-        try:
-            if self.webui_session:
-                await self.webui_session.close()
-                self.webui_session = None
-            self.logger.info("Integration resources cleaned up")
-            
-        except Exception as e:
-            self.logger.error(f"Error during cleanup: {str(e)}")
-            raise RuntimeError(f"Failed to cleanup resources: {str(e)}")
-            
-    async def __aenter__(self):
-        """Async context manager entry"""
-        await self.initialize()
-        return self
-        
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit"""
-        await self.close()
+
 
     def get_available_integrations(self) -> List[str]:
         """Return list of available integrations"""

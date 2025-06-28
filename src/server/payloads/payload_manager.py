@@ -294,7 +294,7 @@ class PayloadManager:
 
     def add_custom_payload(self, content: str, category: str = "custom", description: str = None) -> bool:
         """Add a new custom payload"""
-        if not content or not isinstance(content, str):
+        if content is None or not isinstance(content, str) or not content.strip():
             raise ValueError("Content must be a non-empty string")
         try:
             payload = Payload(
@@ -397,44 +397,4 @@ class PayloadManager:
         
         return result
 
-    async def analyze_with_deepseek(self, payload: str, api_key: str) -> Dict[str, Any]:
-        """
-        Analyze SQL injection payload using Deepseek API
-        
-        Args:
-            payload: The SQL injection payload to analyze
-            api_key: Deepseek API key for authentication
-            
-        Returns:
-            Dict containing analysis results from Deepseek
-            
-        Raises:
-            ValueError: If API key is invalid or missing
-            RuntimeError: If API request fails
-        """
-        try:
-            if not api_key or not api_key.startswith('sk-'):
-                raise ValueError("Invalid Deepseek API key")
 
-            self.logger.info(f"Analyzing payload with Deepseek: {payload[:50]}...")
-            
-            # Mock response for now - in production this would make a real API call
-            analysis = {
-                "analysis": {
-                    "type": "union_based",
-                    "risk_level": "high",
-                    "target_tables": ["users"],
-                    "explanation": "This payload attempts to extract passwords",
-                    "recommendations": [
-                        "Use parameterized queries",
-                        "Implement input validation",
-                        "Add WAF protection"
-                    ]
-                }
-            }
-            
-            return analysis
-            
-        except Exception as e:
-            self.logger.error(f"Deepseek analysis failed: {str(e)}")
-            raise RuntimeError(f"Failed to analyze payload: {str(e)}")

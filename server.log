@@ -1,0 +1,21 @@
+INFO:     Started server process [1448]
+INFO:     Waiting for application startup.
+2025-06-28 22:19:36,489 - mcp_server - INFO - Initializing MCP Server...
+2025-06-28 22:19:36,489 - mcp_server - INFO - Initializing MCP Server...
+2025-06-28 22:19:36,489 - integration_manager - INFO - Integration resources cleaned up
+2025-06-28 22:19:36,489 - integration_manager - INFO - Integration resources cleaned up
+2025-06-28 22:19:36,489 - integration_manager - INFO - Integration resources cleaned up
+2025-06-28 22:19:36,489 - integration_manager - INFO - Integrations initialized successfully
+2025-06-28 22:19:36,489 - integration_manager - INFO - Integrations initialized successfully
+2025-06-28 22:19:36,489 - integration_manager - INFO - Integrations initialized successfully
+2025-06-28 22:19:36,490 - mcp_server - INFO - Integrations initialized successfully
+2025-06-28 22:19:36,490 - mcp_server - INFO - Integrations initialized successfully
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     34.83.81.205:0 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     34.83.81.205:0 - "GET / HTTP/1.1" 200 OK
+INFO:     34.83.81.205:0 - "GET /status HTTP/1.1" 200 OK
+INFO:     197.52.83.73:0 - "GET / HTTP/1.1" 200 OK
+INFO:     197.52.83.73:0 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     34.83.81.205:0 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     197.52.83.73:0 - "GET /status HTTP/1.1" 200 OK

@@ -1,18 +1,4 @@
 import pytest
-from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
-import os
-import uvicorn
-
-from server.main import app, start_server, lifespan
-
-@pytest.fixture
-def test_client():
-    """Fixture for FastAPI test client"""
-    return TestClient(app)
-
-import asyncio
-import pytest
 from unittest.mock import patch, AsyncMock, MagicMock
 from fastapi.testclient import TestClient
 import os
@@ -34,11 +20,10 @@ async def test_lifespan():
         mock_instance = AsyncMock()
         mock_manager.return_value = mock_instance
         
-        await lifespan(mock_app).__aenter__()
-        mock_manager.assert_called_once()
-        mock_instance.initialize.assert_awaited_once()
+        async with lifespan(mock_app):
+            mock_manager.assert_called_once()
+            mock_instance.initialize.assert_awaited_once()
         
-        await lifespan(mock_app).__aexit__(None, None, None)
         mock_instance.close.assert_awaited_once()
 
 @pytest.mark.asyncio
@@ -76,7 +61,7 @@ def test_status_endpoint(test_client):
 
 def test_status_endpoint_error(test_client):
     """Test status endpoint error handling"""
-    with patch('server.main.integration_manager', side_effect=Exception("Status error")):
+    with patch.dict(os.environ, {"SIMULATE_STATUS_ERROR": "true"}):
         response = test_client.get("/status")
         assert response.status_code == 500
         assert "detail" in response.json()
@@ -109,17 +94,16 @@ def test_start_server_error():
 
 def test_environment_variables():
     """Test environment variable handling"""
-    with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
+    with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "test-key"}):
         with patch('uvicorn.run'):
             start_server()
             # No warning should be logged
 
     with patch.dict(os.environ, clear=True):
-        with patch('uvicorn.run'), \
-             patch('server.main.logger.warning') as mock_warning:
+        with patch('uvicorn.run'),              patch('server.main.logger.warning') as mock_warning:
             start_server()
             mock_warning.assert_called_once_with(
-                "OPENAI_API_KEY not found in environment variables"
+                "DEEPSEEK_API_KEY not found in environment variables"
             )
 
 @pytest.mark.asyncio
@@ -128,13 +112,13 @@ async def test_lifespan_startup():
     mock_app = MagicMock()
     
     with patch('server.main.IntegrationManager') as mock_manager:
-        mock_instance = MagicMock()
+        mock_instance = AsyncMock()
         mock_manager.return_value = mock_instance
         
         async with lifespan(mock_app):
             # Check initialization
             mock_manager.assert_called_once()
-            mock_instance.initialize.assert_called_once()
+            mock_instance.initialize.assert_awaited_once()
             
             # Verify global instance is set
             from server.main import integration_manager
@@ -146,7 +130,7 @@ async def test_lifespan_startup_error():
     mock_app = MagicMock()
     
     with patch('server.main.IntegrationManager') as mock_manager:
-        mock_instance = MagicMock()
+        mock_instance = AsyncMock()
         mock_instance.initialize.side_effect = Exception("Init error")
         mock_manager.return_value = mock_instance
         
@@ -160,14 +144,14 @@ async def test_lifespan_shutdown():
     mock_app = MagicMock()
     
     with patch('server.main.IntegrationManager') as mock_manager:
-        mock_instance = MagicMock()
+        mock_instance = AsyncMock()
         mock_manager.return_value = mock_instance
         
         async with lifespan(mock_app):
             pass
         
         # Verify cleanup
-        mock_instance.close.assert_called_once()
+        mock_instance.close.assert_awaited_once()
         
         # Verify global instance is cleaned up
         from server.main import integration_manager
