@@ -1,0 +1,26 @@
+# Core dependencies
+fastapi>=0.68.0
+uvicorn>=0.15.0
+python-multipart>=0.0.5
+aiohttp>=3.8.1
+pydantic>=1.8.2
+
+# SQL Injection and Security
+sqlmap-python>=1.6.12
+requests>=2.26.0
+aiofiles>=0.8.0
+
+# LangChain Integration
+langchain>=0.0.150
+openai>=0.27.0
+
+# Utilities
+python-dotenv>=0.19.0
+pyyaml>=5.4.1
+colorama>=0.4.4
+tqdm>=4.62.3
+
+# Testing
+pytest>=6.2.5
+pytest-asyncio>=0.16.0
+httpx>=0.23.0
